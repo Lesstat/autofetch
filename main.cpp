@@ -1,12 +1,13 @@
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 #include <wordexp.h>
 
-std::string get_path() {
+std::string get_path(const char *path) {
   wordexp_t p;
   char **w;
   std::string result;
-  wordexp("~/.emacs.d/projectile-bookmarks.eld", &p, 0);
+  wordexp(path, &p, 0);
   w = p.we_wordv;
   result = w[0];
   wordfree(&p);
@@ -22,10 +23,17 @@ void sanitize_dir(std::string &dir) {
     dir.pop_back();
   }
   dir.pop_back();
+  dir = get_path(dir.c_str());
+}
+
+void git_fetch(const std::string &dir) {
+  chdir(dir.c_str());
+  system("git fetch --all");
 }
 
 int main() {
-  std::string projectile_bookmarks = get_path();
+  std::string projectile_bookmarks =
+      get_path("~/.emacs.d/projectile-bookmarks.eld");
   std::ifstream file{projectile_bookmarks};
   std::string dir;
 
@@ -34,7 +42,7 @@ int main() {
     while (!file.eof()) {
       file >> dir;
       sanitize_dir(dir);
-      std::cout << dir << std::endl;
+      git_fetch(dir);
     }
   } else {
     std::cout << "Couldn't open projectile repository bookmarks" << std::endl;
