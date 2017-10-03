@@ -28,6 +28,7 @@ void sanitize_dir(std::string &dir) {
 
 void git_fetch(const std::string &dir) {
   chdir(dir.c_str());
+  std::cout << "Starting git fetch for " << dir << std::endl;
   system("git fetch --all");
 }
 
@@ -38,7 +39,6 @@ int main() {
   std::string dir;
 
   if (file.is_open()) {
-
     while (!file.eof()) {
       file >> dir;
       sanitize_dir(dir);
