@@ -22,7 +22,6 @@ void sanitize_dir(std::string &dir) {
     dir.pop_back();
   }
   dir.pop_back();
-  dir = get_path(dir.c_str());
 }
 
 void git_fetch(const std::string &dir) {
@@ -37,11 +36,21 @@ int main() {
   std::string projectile_bookmarks =
       get_path("~/.emacs.d/projectile-bookmarks.eld");
   std::ifstream file{projectile_bookmarks};
-  std::string dir;
 
   if (file.is_open()) {
-    while (!file.eof()) {
-      file >> dir;
+    std::string content;
+    getline(file, content);
+    std::stringstream ss{content};
+
+    while (!ss.eof()) {
+      std::string dir;
+      ss >> dir;
+      while (dir.back() != '"' && dir.back() != ')') {
+        std::string rest;
+        ss >> rest;
+        dir += "\\ " + rest;
+        std::cout << dir << std::endl;
+      }
       sanitize_dir(dir);
       git_fetch(dir);
     }
