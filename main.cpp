@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <wordexp.h>
 
 std::string get_path(const char *path) {
